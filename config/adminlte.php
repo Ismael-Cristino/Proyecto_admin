@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'calendario',
+    'dashboard_url' => 'home',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -345,17 +345,17 @@ return [
         [
             'text' => 'Pendientes (Nuevos)',
             'url'  => 'pedidos/pendientes',
-            'icon' => 'fas fa-box',
+            'icon' => 'fas fa-clock',
         ],
         [
             'text' => 'Reservados',
             'url'  => 'pedidos/reservados',
-            'icon' => 'fas fa-boxes',
+            'icon' => 'fas fa-calendar-check',
         ],
         [
             'text' => 'Pagados',
             'url'  => 'pedidos/pagados',
-            'icon' => 'fas fa-dolly',
+            'icon' => 'fas fa-euro-sign',
         ],
         [
             'text' => 'Completados',
@@ -365,56 +365,25 @@ return [
         [
             'text' => 'Cancelados',
             'url'  => 'pedidos/cancelados',
-            'icon' => 'fas fa-file-excel',
+            'icon' => 'fas fa-times',
         ],
-        ['header' => 'account_settings'],
+        ['header' => 'Ajustes de usuario'],
         [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
+            'text' => 'Cambiar contraseña',
+            'url' => 'usuarios/password',
             'icon' => 'fas fa-fw fa-lock',
         ],
         [
-            'text' => 'multilevel',
-            'icon' => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                        ],
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-            ],
+            'text' => 'Crear usuario',
+            'url' => 'usuarios/crear',
+            'icon' => 'fas fa-fw fa-user-plus',
+            'can' => 'admin-only',
+        ],
+        [
+            'text' => 'Gestionar usuarios',
+            'url' => 'usuarios',
+            'icon' => 'fas fa-fw fa-users',
+            'can' => 'admin-only', // mostrará esto solo si el usuario es admin
         ],
     ],
 

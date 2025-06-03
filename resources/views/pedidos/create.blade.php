@@ -30,7 +30,15 @@
             </div>
         </div>
 
-        <input type="date" name="fecha" class="form-control mb-2" value="{{ old('fecha') }}">
+        <div class="form-group">
+            <label for="fecha_inicio">Fecha y hora de inicio</label>
+            <input type="datetime-local" name="fecha_inicio" class="form-control mb-2" value="{{ old('fecha_inicio') }}">
+        </div>
+
+        <div class="form-group">
+            <label for="fecha_fin">Fecha y hora de fin</label>
+            <input type="datetime-local" name="fecha_fin" class="form-control mb-2" value="{{ old('fecha_fin') }}">
+        </div>
 
         <select name="servicio" class="form-control mb-2">
             <option value="">-- Selecciona un servicio --</option>

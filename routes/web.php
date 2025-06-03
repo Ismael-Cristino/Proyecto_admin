@@ -4,7 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 // Página pública
 Route::get('/', function () {
@@ -12,7 +15,10 @@ Route::get('/', function () {
 })->name('public.home'); // <- esto define la ruta que te falta
 
 // Autenticación
-Auth::routes();
+// Solo login/logout
+Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 // Área privada
 Route::middleware(['auth'])->group(function () {
@@ -21,37 +27,35 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/calendario', [CalendarioController::class, 'index'])->name('calendario');
 
-Route::get('/api/pedidos', function () {
+Route::get('/api/eventos-calendario', function () {
     $pedidos = DB::select("
-        SELECT p.descripcion, p.horas, f.fecha
+        SELECT p.descripcion, p.estado, f.fecha_inicio, f.fecha_fin
         FROM pedidos p
-        INNER JOIN fechas f ON p.id_fecha = f.id
-        WHERE f.estado IN ('reservado', 'pagado')
+        INNER JOIN fechas f ON p.id_fecha = f.id_fecha
+        WHERE p.estado IN ('reservado', 'pagado', 'completado')
     ");
 
     $eventos = [];
 
     foreach ($pedidos as $pedido) {
-        $horas = (float) $pedido->horas;
-
-        $startDateTime = new DateTime($pedido->fecha);
-        $horasEnteras = floor($horas);
-        $minutos = ($horas - $horasEnteras) * 60;
-
-        $interval = new DateInterval(sprintf('PT%dH%dM', $horasEnteras, $minutos));
-        $endDateTime = clone $startDateTime;
-        $endDateTime->add($interval);
+        $color = match($pedido->estado) {
+            'completado' => '#28a745',     // Verde
+            'pagado'     => '#17a2b8',     // Azul verdoso
+            'reservado'  => '#007bff',     // Azul
+            default      => '#6c757d',     // Gris por defecto (no debería llegar)
+        };
 
         $eventos[] = [
             'title' => $pedido->descripcion,
-            'start' => $startDateTime->format('Y-m-d\TH:i:s'),
-            'end' => $endDateTime->format('Y-m-d\TH:i:s'),
-            'color' => '#3788d8', // azul
+            'start' => Carbon::parse($pedido->fecha_inicio)->toIso8601String(),
+            'end'   => Carbon::parse($pedido->fecha_fin)->toIso8601String(),
+            'color' => $color,
         ];
     }
 
     return response()->json($eventos);
 });
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/pedidos/pendientes', [PedidoController::class, 'pendientes'])->name('pedidos.pendientes');
@@ -70,4 +74,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pedidos', [PedidoController::class, 'store'])->name('pedidos.store');
 
     Route::resource('pedidos', PedidoController::class);
+
+    Route::get('/pedidos/{id}/edit', [PedidoController::class, 'edit'])->name('pedidos.edit');
+
+    Route::put('/pedidos/{id}', [PedidoController::class, 'update'])->name('pedidos.update');
+});
+
+Route::middleware(['auth'])->group(function () {
+    // Usuarios
+    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::get('/usuarios/crear', [UserController::class, 'create'])->name('usuarios.create');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
+    // Mostrar formulario de cambio de contraseña
+    Route::get('/usuarios/password', fn() => view('usuarios.password'))->name('usuarios.password.form');
+    // Procesar cambio de contraseña
+    Route::post('/usuarios/password', [UserController::class, 'changePassword'])->name('usuarios.password');
+    // Eliminar usuario
+    Route::delete('/usuarios/{usuario}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 });

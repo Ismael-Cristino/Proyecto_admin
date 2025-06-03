@@ -9,6 +9,7 @@
 @section('content')
     <form action="{{ route('pedidos.update', $pedido->id_pedido) }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_back" value="{{ $redirect_back }}">
         @method('PUT')
 
         <div class="form-group">
@@ -50,14 +51,17 @@
         </div>
 
         <div class="form-group">
-            <label for="id_fecha">Fecha</label>
-            <select name="id_fecha" class="form-control" required>
-                @foreach($fechas as $fecha)
-                    <option value="{{ $fecha->id_fecha }}" {{ $pedido->id_fecha == $fecha->id_fecha ? 'selected' : '' }}>
-                        {{ $fecha->fecha }}
-                    </option>
-                @endforeach
-            </select>
+            <label for="fecha_inicio">Fecha y hora de inicio</label>
+            <input type="datetime-local" name="fecha_inicio" class="form-control"
+                value="{{ old('fecha_inicio', \Carbon\Carbon::parse($pedido->fecha->fecha_inicio)->format('Y-m-d\TH:i')) }}"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="fecha_fin">Fecha y hora de fin</label>
+            <input type="datetime-local" name="fecha_fin" class="form-control"
+                value="{{ old('fecha_fin', \Carbon\Carbon::parse($pedido->fecha->fecha_fin)->format('Y-m-d\TH:i')) }}"
+                required>
         </div>
 
         <hr>
@@ -94,6 +98,6 @@
 
 
         <button type="submit" class="btn btn-primary">Actualizar</button>
-        <a href="{{ url()->previous() }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ session('redirect_back', route('pedidos.index')) }}" class="btn btn-secondary">Cancelar</a>
     </form>
 @endsection

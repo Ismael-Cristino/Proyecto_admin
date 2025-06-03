@@ -49,7 +49,7 @@ class PedidoController extends Controller
         $pedido = Pedido::findOrFail($id);
         $clientes = Cliente::all();
         $fechas = Fecha::all();
-        return view('pedidos.edit', compact('pedido', 'clientes', 'fechas'));
+        return view('pedidos.edit', compact('pedido', 'clientes', 'fechas'))->with('redirect_back', url()->previous());
     }
 
     public function update(Request $request, $id_pedido)
@@ -58,12 +58,14 @@ class PedidoController extends Controller
 
         // Validar (puedes ampliar si necesitas más reglas)
         $request->validate([
-            'descripcion' => 'required|string',
-            'servicio' => 'required|string',
-            'estado' => 'required|string',
-            'id_fecha' => 'required|exists:fechas,id_fecha',
+            'descripcion'    => 'required|string',
+            'servicio'       => 'required|string',
+            'estado'         => 'required|string',
             'nombre_cliente' => 'required|string|max:255',
-            'precio_bruto' => 'required|numeric|min:0',
+            'fecha_inicio'   => 'required|date',
+            'fecha_fin'      => 'required|date|after_or_equal:fecha_inicio',
+            'precio_bruto'   => 'required|numeric|min:0',
+            'redirect_back'  => 'nullable|url',
         ]);
 
         // Actualizar el cliente relacionado
@@ -75,9 +77,13 @@ class PedidoController extends Controller
         $pedido->descripcion = $request->descripcion;
         $pedido->servicio = $request->servicio;
         $pedido->estado = $request->estado;
-        $pedido->id_cliente = $request->id_cliente;
-        $pedido->id_fecha = $request->id_fecha;
         $pedido->save();
+
+        // Actualizar la fecha relacionada
+        $fecha = Fecha::findOrFail($pedido->id_fecha);
+        $fecha->fecha_inicio = $request->fecha_inicio;
+        $fecha->fecha_fin = $request->fecha_fin;
+        $fecha->save();
 
         // Actualizar factura
         $factura = $pedido->factura;
@@ -89,6 +95,12 @@ class PedidoController extends Controller
         $factura->iva = $iva;
         $factura->precio_final = $precioFinal;
         $factura->save();
+
+        // Redirigir: si viene redirect_back, úsalo; si no, decidir por estado
+        if ($request->filled('redirect_back')) {
+        return redirect($request->redirect_back)
+               ->with('success', 'Pedido actualizado correctamente.');
+    }
 
         // Redireccionar según el estado
         switch ($pedido->estado) {
@@ -132,7 +144,8 @@ class PedidoController extends Controller
             'nombre' => 'required|string|max:255',
             'numero' => 'required|digits_between:8,15',
             'email' => 'required|email',
-            'fecha' => 'required|date',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'servicio' => 'required|string',
             'direccionOri' => 'required|string',
             'direccionDes' => 'required|string',
@@ -150,12 +163,13 @@ class PedidoController extends Controller
             'email' => $request->email,
         ]);
 
-        $fecha = Fecha::firstOrCreate([
-            'fecha' => $request->fecha,
-            'estado' => 'ocupado'
+        $fecha = Fecha::create([
+            'fecha_inicio' => $request->fecha_inicio,
+            'fecha_fin' => $request->fecha_fin,
+            'estado' => 'ocupado',
         ]);
 
-        $factura = Factura::firstOrCreate([
+        $factura = Factura::create([
             'precio_bruto' => $precioBruto,
             'iva' => $iva,
             'precio_final' => $precioFinal,

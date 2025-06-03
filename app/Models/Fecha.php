@@ -11,7 +11,7 @@ class Fecha extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'fecha', 'estado'
+        'fecha_inicio', 'fecha_fin', 'estado'
     ];
 }
 

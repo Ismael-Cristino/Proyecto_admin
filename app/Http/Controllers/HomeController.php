@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Pedido;
 
 class HomeController extends Controller
 {
@@ -23,6 +24,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('home', [
+            'pendientes' => Pedido::where('estado', 'pendiente')->count(),
+            'reservados' => Pedido::where('estado', 'reservado')->count(),
+            'pagados' => Pedido::where('estado', 'pagado')->count(),
+            'completados' => Pedido::where('estado', 'completado')->count(),
+            'cancelados' => Pedido::where('estado', 'cancelado')->count(),
+        ]);
     }
 }

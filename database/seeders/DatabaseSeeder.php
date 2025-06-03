@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $path = database_path('scripts/bd.sql');
+        /*$path = database_path('scripts/bd.sql');
 
         if (!file_exists($path)) {
             throw new \Exception("SQL file not found at: $path");
@@ -21,13 +21,14 @@ class DatabaseSeeder extends Seeder
         $sql = file_get_contents($path);
         DB::unprepared($sql);
 
-        $this->command->info('Base de datos importada desde bd.sql');
+        $this->command->info('Base de datos importada desde bd.sql');*/
 
         $this->call([
             ClienteSeeder::class,
             FechaSeeder::class,
             FacturaSeeder::class,
             PedidoSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

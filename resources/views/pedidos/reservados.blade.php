@@ -45,7 +45,7 @@
                                 Otros
                         @endswitch
                     </td>
-                    <td>{{ $pedido->fecha->fecha ?? 'Sin fecha' }}</td>
+                    <td>{{ $pedido->fecha->fecha_inicio ?? 'Sin fecha' }}</td>
                     <td>{{ $pedido->estado }}</td>
                     <td>{{ $pedido->factura->precio_bruto ?? 'Sin precio' }}</td>
                     <td>{{ $pedido->factura->precio_final ?? 'Sin precio' }}</td>
