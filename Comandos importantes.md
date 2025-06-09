@@ -20,3 +20,7 @@ sudo chown -R daemon:daemon /opt/lampp/htdocs/Proyecto_admin/bootstrap/cache
 
 sudo chmod -R 775 /opt/lampp/htdocs/Proyecto_admin/storage
 sudo chmod -R 775 /opt/lampp/htdocs/Proyecto_admin/bootstrap/cache
+
+- **Configuración de VirtualHost**
+
+/opt/lampp/etc/httpd.conf
