@@ -98,6 +98,7 @@
 
 
         <button type="submit" class="btn btn-primary">Actualizar</button>
-        <a href="{{ session('redirect_back', route('pedidos.index')) }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">Cancelar</a>
+
     </form>
 @endsection
